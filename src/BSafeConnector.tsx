@@ -6,6 +6,20 @@ import { TransactionRequestLike } from "fuels";
 const URL = "http://localhost:3333";
 const BSAFEAPP = "http://localhost:5173";
 
+class DAppWindow {
+  constructor(
+      private config: {width: number, height: number, left: number, top: number}
+  ) {}
+
+  open(url: string) {
+    return  window.open(
+        url,
+        "popup",
+        `left=${this.config.left},top=${this.config.top},width=${this.config.width},height=${this.config.height}`
+    );
+  }
+}
+
 // low                    -> wallet
 // high with []           -> socket server[api]
 // high with []_type      -> popup
@@ -33,7 +47,14 @@ export class BSafeConnector extends EventEmitter {
   private readonly api: AxiosInstance = axios.create({
     baseURL: URL,
   });
-  private windowFeatures: string = "left=100,top=100,width=320,height=320";
+
+  private dAppWindow = new DAppWindow({
+    top: 0,
+    left: 0,
+    width: 400,
+    height: 600,
+  })
+
   constructor() {
     super();
     let sessionId: string = localStorage.getItem("sessionId") || "";
@@ -60,11 +81,7 @@ export class BSafeConnector extends EventEmitter {
 
   async connect() {
     return new Promise((resolve) => {
-      const w = window.open(
-        `${BSAFEAPP}/?sessionId=${this.sessionId}&name=${this.name}&origin=${window.origin}`,
-        "popup",
-        this.windowFeatures
-      );
+      const w = this.dAppWindow.open(`${BSAFEAPP}/?sessionId=${this.sessionId}&name=${this.name}&origin=${window.origin}`);
       w?.addEventListener("close", () => {
         resolve(false);
       });
@@ -86,11 +103,7 @@ export class BSafeConnector extends EventEmitter {
   ) {
     //const acc = await this.currentAccount();
     return new Promise((resolve, reject) => {
-      const w = window.open(
-        `${BSAFEAPP}/dapp/transaction/?sessionId=${this.sessionId}&name=${this.name}&origin=${window.origin}`,
-        "mozillaWindow",
-        "popup"
-      );
+      const w = this.dAppWindow.open(`${BSAFEAPP}/dapp/transaction/?sessionId=${this.sessionId}&name=${this.name}&origin=${window.origin}`);
       w?.addEventListener("close", () => {
         reject("closed");
       });
