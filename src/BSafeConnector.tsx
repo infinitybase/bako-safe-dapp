@@ -12,7 +12,7 @@ class DAppWindow {
   ) {}
 
   open(url: string) {
-    return  window.open(
+    return window.open(
         url,
         "popup",
         `left=${this.config.left},top=${this.config.top},width=${this.config.width},height=${this.config.height}`
@@ -51,8 +51,8 @@ export class BSafeConnector extends EventEmitter {
   private dAppWindow = new DAppWindow({
     top: 0,
     left: 0,
-    width: 400,
-    height: 600,
+    width: 500,
+    height: 750,
   })
 
   constructor() {
