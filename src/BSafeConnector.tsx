@@ -8,32 +8,38 @@ const BSAFEAPP = "http://localhost:5173";
 
 class DAppWindow {
   constructor(
-      private config: {
-        popup: {
-          top: number,
-          left: number,
-          width: number,
-          height: number,
-        },
-        sessionId: string;
-        name: string;
-        origin: string;
-      }
+    private config: {
+      popup: {
+        top: number;
+        left: number;
+        width: number;
+        height: number;
+      };
+      sessionId: string;
+      name: string;
+      origin: string;
+      currentVault?: string;
+    }
   ) {}
 
-  open(method: string) {
+  async open(method: string) {
     const { popup } = this.config;
 
+    const bsafe = new BSafeConnector();
+    this.config.currentVault = await bsafe.currentAccount();
+
     return window.open(
-        `${BSAFEAPP}${method}${this.queryString}`,
-        "popup",
-        `left=${popup.left},top=${popup.top},width=${popup.width},height=${popup.height}`
+      `${BSAFEAPP}${method}${this.queryString}`,
+      "popup",
+      `left=${popup.left},top=${popup.top},width=${popup.width},height=${popup.height}`
     );
   }
 
   private get queryString() {
-    const { origin, name, sessionId } = this.config;
-    return `?sessionId=${sessionId}&name=${name}&origin=${origin}`;
+    const { origin, name, sessionId, currentVault } = this.config;
+    return `?sessionId=${sessionId}&name=${name}&origin=${origin}${
+      currentVault ? `&currentVault=${currentVault}` : ""
+    }`;
   }
 }
 
@@ -65,7 +71,7 @@ export class BSafeConnector extends EventEmitter {
     baseURL: URL,
   });
 
-  private dAppWindow : DAppWindow;
+  private dAppWindow: DAppWindow;
 
   constructor() {
     super();
@@ -92,11 +98,11 @@ export class BSafeConnector extends EventEmitter {
       origin: window.origin,
       popup: {
         top: 0,
-        left: 0,
-        width: 500,
-        height: 750,
+        left: 2600,
+        width: 450,
+        height: 1750,
       },
-    })
+    });
 
     this.socket.on(WalletEnumEvents.DEFAULT, (message) => {
       this.emit(message.type, ...message.data);
@@ -105,7 +111,7 @@ export class BSafeConnector extends EventEmitter {
 
   async connect() {
     return new Promise((resolve) => {
-      const w = this.dAppWindow.open('/');
+      const w = this.dAppWindow.open("/");
       w?.addEventListener("close", () => {
         resolve(false);
       });
