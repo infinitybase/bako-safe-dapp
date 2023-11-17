@@ -8,26 +8,26 @@ const BSAFEAPP = "http://localhost:5173";
 
 class DAppWindow {
   constructor(
-      private config: {
-        popup: {
-          top: number,
-          left: number,
-          width: number,
-          height: number,
-        },
-        sessionId: string;
-        name: string;
-        origin: string;
-      }
+    private config: {
+      popup: {
+        top: number;
+        left: number;
+        width: number;
+        height: number;
+      };
+      sessionId: string;
+      name: string;
+      origin: string;
+    }
   ) {}
 
   open(method: string) {
     const { popup } = this.config;
 
     return window.open(
-        `${BSAFEAPP}${method}${this.queryString}`,
-        "popup",
-        `left=${popup.left},top=${popup.top},width=${popup.width},height=${popup.height}`
+      `${BSAFEAPP}${method}${this.queryString}`,
+      "popup",
+      `left=${popup.left},top=${popup.top},width=${popup.width},height=${popup.height}`
     );
   }
 
@@ -65,7 +65,7 @@ export class BSafeConnector extends EventEmitter {
     baseURL: URL,
   });
 
-  private dAppWindow : DAppWindow;
+  private dAppWindow: DAppWindow;
 
   constructor() {
     super();
@@ -92,11 +92,11 @@ export class BSafeConnector extends EventEmitter {
       origin: window.origin,
       popup: {
         top: 0,
-        left: 0,
-        width: 500,
-        height: 750,
+        left: 2560,
+        width: 450,
+        height: 1280,
       },
-    })
+    });
 
     this.socket.on(WalletEnumEvents.DEFAULT, (message) => {
       this.emit(message.type, ...message.data);
@@ -105,7 +105,7 @@ export class BSafeConnector extends EventEmitter {
 
   async connect() {
     return new Promise((resolve) => {
-      const w = this.dAppWindow.open('/');
+      const w = this.dAppWindow.open("/");
       w?.addEventListener("close", () => {
         resolve(false);
       });
