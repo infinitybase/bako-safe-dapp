@@ -16,6 +16,7 @@ const simulateTransaction = async (bsafeVault: string) => {
   }
 
   const fuelCurrentAccount = await fuel.currentAccount();
+
   const provider = await Provider.create('https://beta-4.fuel.network/graphql');
   const { gasLimit, gasPrice } = await getGasConfig(provider);
   const transactionRequest = new ScriptTransactionRequest({

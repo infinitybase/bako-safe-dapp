@@ -88,7 +88,7 @@ export class BSafeConnector extends EventEmitter {
 
     this.dAppWindow = new DAppWindow({
       sessionId,
-      name: this.name,
+      name: document.title,
       origin: window.origin,
       popup: {
         top: 0,
