@@ -1,10 +1,10 @@
-import { EventEmitter } from "events";
-import { io, Socket } from "socket.io-client";
-import axios, { AxiosInstance } from "axios";
-import { TransactionRequestLike } from "fuels";
+import { EventEmitter } from 'events';
+import { io, Socket } from 'socket.io-client';
+import axios, { AxiosInstance } from 'axios';
+import { TransactionRequestLike } from 'fuels';
 
-const URL = "http://localhost:3333";
-const BSAFEAPP = "http://localhost:5173";
+const URL = 'http://localhost:3333';
+const BSAFEAPP = 'http://localhost:5173';
 
 class DAppWindow {
   constructor(
@@ -26,7 +26,7 @@ class DAppWindow {
 
     return window.open(
       `${BSAFEAPP}${method}${this.queryString}`,
-      "popup",
+      'popup',
       `left=${popup.left},top=${popup.top},width=${popup.width},height=${popup.height}`
     );
   }
@@ -42,23 +42,23 @@ class DAppWindow {
 // high with []_type      -> popup
 export enum WalletEnumEvents {
   //accounts
-  ACCOUNTS = "accounts",
-  CURRENT_ACCOUNT = "currentAccount",
+  ACCOUNTS = 'accounts',
+  CURRENT_ACCOUNT = 'currentAccount',
 
   // transfer
-  TRANSACTION_CREATED = "[TRANSACTION_CREATED]",
-  TRANSACTION_SEND = "[TRANSACTION_SEND]",
+  TRANSACTION_CREATED = '[TRANSACTION_CREATED]',
+  TRANSACTION_SEND = '[TRANSACTION_SEND]',
 
   //connections
-  CONNECTION = "connection",
-  POPUP_TRANSFER = "[POPUP_TRANSFER]_connected",
+  CONNECTION = 'connection',
+  POPUP_TRANSFER = '[POPUP_TRANSFER]_connected',
 
   //default
-  DEFAULT = "message",
+  DEFAULT = 'message',
 }
 
 export class BSafeConnector extends EventEmitter {
-  name = "BSage Vault";
+  name = 'BSage Vault';
   private readonly socket: Socket;
   private readonly sessionId: string;
   private readonly api: AxiosInstance = axios.create({
@@ -69,17 +69,17 @@ export class BSafeConnector extends EventEmitter {
 
   constructor() {
     super();
-    let sessionId: string = localStorage.getItem("sessionId") || "";
+    let sessionId: string = localStorage.getItem('sessionId') || '';
     if (!sessionId) {
       sessionId = crypto.randomUUID();
-      localStorage.setItem("sessionId", sessionId);
+      localStorage.setItem('sessionId', sessionId);
     }
     console.log(sessionId);
     this.sessionId = sessionId;
 
     this.socket = io(URL, {
       auth: {
-        username: `${"[WALLET]"}`,
+        username: `${'[WALLET]'}`,
         data: new Date(),
         sessionId: this.sessionId,
         origin: window.origin,
@@ -105,8 +105,8 @@ export class BSafeConnector extends EventEmitter {
 
   async connect() {
     return new Promise((resolve) => {
-      const w = this.dAppWindow.open("/");
-      w?.addEventListener("close", () => {
+      const w = this.dAppWindow.open('/');
+      w?.addEventListener('close', () => {
         resolve(false);
       });
       this.on(WalletEnumEvents.CONNECTION, (connection) => {
@@ -128,8 +128,8 @@ export class BSafeConnector extends EventEmitter {
     //const acc = await this.currentAccount();
     return new Promise((resolve, reject) => {
       const w = this.dAppWindow.open(`/dapp/transaction`);
-      w?.addEventListener("close", () => {
-        reject("closed");
+      w?.addEventListener('close', () => {
+        reject('closed');
       });
       this.on(WalletEnumEvents.POPUP_TRANSFER, () => {
         this.socket.emit(WalletEnumEvents.TRANSACTION_SEND, {
