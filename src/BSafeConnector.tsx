@@ -4,7 +4,7 @@ import axios, { AxiosInstance } from 'axios';
 import { TransactionRequestLike } from 'fuels';
 
 const URL = 'http://localhost:3333';
-const BSAFEAPP = 'http://localhost:5173';
+const BSAFEAPP = 'http://localhost:5174';
 
 class DAppWindow {
   constructor(
@@ -49,9 +49,16 @@ export enum WalletEnumEvents {
   TRANSACTION_CREATED = '[TRANSACTION_CREATED]',
   TRANSACTION_SEND = '[TRANSACTION_SEND]',
 
+  //popup auth
+  AUTH_CONFIRMED = '[AUTH_CONFIRMED]',
+  AUTH_REJECTED = '[AUTH_REJECTED]',
+  AUTH_DISCONECT_DAPP = '[AUTH_DISCONECT_DAPP]',
+  AUTH_DISCONECT_CONFIRM = '[AUTH_DISCONECT_CONFIRM]',
+
   //connections
   CONNECTION = 'connection',
   POPUP_TRANSFER = '[POPUP_TRANSFER]_connected',
+  CONNECTED_NETWORK = '[CONNECTED_NETWORK]',
 
   //default
   DEFAULT = 'message',
@@ -64,7 +71,7 @@ export class BSafeConnector extends EventEmitter {
   private readonly api: AxiosInstance = axios.create({
     baseURL: URL,
   });
-
+  private network!: string;
   private dAppWindow: DAppWindow;
 
   constructor() {
@@ -74,7 +81,7 @@ export class BSafeConnector extends EventEmitter {
       sessionId = crypto.randomUUID();
       localStorage.setItem('sessionId', sessionId);
     }
-    console.log(sessionId);
+
     this.sessionId = sessionId;
 
     this.socket = io(URL, {
@@ -108,6 +115,9 @@ export class BSafeConnector extends EventEmitter {
       const w = this.dAppWindow.open('/');
       w?.addEventListener('close', () => {
         resolve(false);
+      });
+      this.on(WalletEnumEvents.CONNECTED_NETWORK, (network) => {
+        this.network = network;
       });
       this.on(WalletEnumEvents.CONNECTION, (connection) => {
         resolve(connection);
@@ -146,17 +156,17 @@ export class BSafeConnector extends EventEmitter {
     });
   }
 
-  //   async ping() {
-  //     await setTimeout(this._pingDelay);
-  //     return true;
-  //   }
+  async ping() {
+    return true;
+  }
 
-  //   async version() {
-  //     return {
-  //       app: "0.0.1",
-  //       network: ">=0.12.4",
-  //     };
-  //   }
+  //todo: make a file on sdk, to return this object
+  async version() {
+    return {
+      app: '0.0.1',
+      network: '>=0.12.4',
+    };
+  }
 
   async isConnected() {
     const { data } = await this.api.get(
@@ -181,12 +191,18 @@ export class BSafeConnector extends EventEmitter {
     return data;
   }
 
-  //   async disconnect() {
-  //     this.emit(FuelConnectorEventTypes.connection, false);
-  //     this.emit(FuelConnectorEventTypes.accounts, []);
-  //     this.emit(FuelConnectorEventTypes.currentAccount, null);
-  //     return false;
-  //   }
+  async disconnect() {
+    this.socket.emit(WalletEnumEvents.AUTH_DISCONECT_DAPP, {
+      to: `${this.sessionId}:${window.origin}`,
+      content: {
+        sessionId: this.sessionId,
+      },
+    });
+    this.emit(WalletEnumEvents.CONNECTION, false);
+    this.emit(WalletEnumEvents.ACCOUNTS, []);
+    this.emit(WalletEnumEvents.CURRENT_ACCOUNT, null);
+    return false;
+  }
 
   //   async signMessage(_address: string, _message: string) {
   //     const wallet = this._wallets.find((w) => w.address.toString() === _address);
@@ -224,9 +240,9 @@ export class BSafeConnector extends EventEmitter {
   //     return this._networks ?? [];
   //   }
 
-  //   async currentNetwork() {
-  //     return this._networks[0];
-  //   }
+  async currentNetwork() {
+    return this.network;
+  }
 
   //   async addABI(_contractId: string, _abi: FuelABI) {
   //     return true;
