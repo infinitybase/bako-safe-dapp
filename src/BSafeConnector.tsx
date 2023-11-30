@@ -1,10 +1,18 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { EventEmitter } from 'events';
 import { io, Socket } from 'socket.io-client';
 import axios, { AxiosInstance } from 'axios';
-import { TransactionRequestLike } from 'fuels';
+import { JsonAbi, TransactionRequestLike } from 'fuels';
+import { Asset } from '@fuel-wallet/types';
 
 const URL = 'http://localhost:3333';
-const BSAFEAPP = 'http://localhost:5174';
+const BSAFEAPP = 'http://localhost:5173';
+
+type FuelABI = JsonAbi;
+type Network = {
+  url: string;
+  chainId: number;
+};
 
 class DAppWindow {
   constructor(
@@ -66,12 +74,23 @@ export enum WalletEnumEvents {
 
 export class BSafeConnector extends EventEmitter {
   name = 'BSage Vault';
+  metadata = {
+    image: 'https://avatars.githubusercontent.com/u/8186664?s=200&v=4',
+    install: {
+      action: 'https://chrome.google.com/webstore/detail/bsafe-vault',
+      link: 'google.com',
+      description:
+        'BSafe Vault is a browser extension that allows you to interact with the BSafe Network.',
+    },
+  };
+  installed: boolean = true;
+  connected: boolean = false;
+
   private readonly socket: Socket;
   private readonly sessionId: string;
   private readonly api: AxiosInstance = axios.create({
     baseURL: URL,
   });
-  private network!: string;
   private dAppWindow: DAppWindow;
 
   constructor() {
@@ -116,10 +135,8 @@ export class BSafeConnector extends EventEmitter {
       w?.addEventListener('close', () => {
         resolve(false);
       });
-      this.on(WalletEnumEvents.CONNECTED_NETWORK, (network) => {
-        this.network = network;
-      });
       this.on(WalletEnumEvents.CONNECTION, (connection) => {
+        this.connected = connection;
         resolve(connection);
       });
     });
@@ -135,7 +152,7 @@ export class BSafeConnector extends EventEmitter {
     _address: string,
     _transaction: TransactionRequestLike
   ) {
-    //const acc = await this.currentAccount();
+    console.log('[SEND_TRANSACTION]: ', _address, _transaction);
     return new Promise((resolve, reject) => {
       const w = this.dAppWindow.open(`/dapp/transaction`);
       w?.addEventListener('close', () => {
@@ -151,7 +168,8 @@ export class BSafeConnector extends EventEmitter {
         });
       });
       this.on(WalletEnumEvents.TRANSACTION_CREATED, (content) => {
-        resolve(content);
+        console.log('TRANSACTION_CREATED', content);
+        resolve(`0x${content}`);
       });
     });
   }
@@ -187,7 +205,6 @@ export class BSafeConnector extends EventEmitter {
     const { data } = await this.api.get(
       `${URL}/connections/${this.sessionId}/currentAccount`
     );
-
     return data;
   }
 
@@ -204,44 +221,52 @@ export class BSafeConnector extends EventEmitter {
     return false;
   }
 
-  //   async signMessage(_address: string, _message: string) {
-  //     const wallet = this._wallets.find((w) => w.address.toString() === _address);
-  //     if (!wallet) {
-  //       throw new Error("Wallet is not found!");
-  //     }
-  //     return wallet.signMessage(_message);
-  //   }
-
-  //   async currentAccount() {
-  //     return this._accounts[0];
-  //   }
-
-  //   async assets() {
-  //     return [];
-  //   }
-
-  //   async addAssets(_assets: Array<Asset>) {
-  //     return true;
-  //   }
-
-  //   async addNetwork(_network: Network) {
-  //     this._networks.push(_network);
-  //     this.emit(FuelConnectorEventTypes.networks, this._networks);
-  //     this.emit(FuelConnectorEventTypes.currentNetwork, _network);
-  //     return true;
-  //   }
-
-  //   async selectNetwork(_network: Network) {
-  //     this.emit(FuelConnectorEventTypes.currentNetwork, _network);
-  //     return true;
-  //   }
-
-  //   async networks() {
-  //     return this._networks ?? [];
-  //   }
-
   async currentNetwork() {
-    return this.network;
+    const { data } = await this.api.get(
+      `${URL}/connections/${this.sessionId}/currentNetwork`
+    );
+
+    console.log('[currentNetwork]: ', data);
+    return data;
+  }
+
+  async assets(): Promise<Array<Asset>> {
+    return [];
+  }
+
+  async signMessage(address: string, message: string): Promise<string> {
+    throw new Error('Method not implemented.');
+  }
+
+  async addAssets(assets: Asset[]): Promise<boolean> {
+    throw new Error('Method not implemented.');
+  }
+
+  async addAsset(assets: Asset): Promise<boolean> {
+    throw new Error('Method not implemented.');
+  }
+
+  async addNetwork(networkUrl: string): Promise<boolean> {
+    throw new Error('Method not implemented.');
+  }
+
+  async selectNetwork(network: Network): Promise<boolean> {
+    throw new Error('Method not implemented.');
+  }
+  async networks(): Promise<Array<Network>> {
+    throw new Error('Method not implemented.');
+  }
+
+  async addABI(contractId: string, abi: FuelABI): Promise<boolean> {
+    throw new Error('Method not implemented.');
+  }
+
+  async getABI(id: string): Promise<FuelABI | null> {
+    throw new Error('Method not implemented.');
+  }
+
+  async hasABI(id: string): Promise<boolean> {
+    throw new Error('Method not implemented.');
   }
 
   //   async addABI(_contractId: string, _abi: FuelABI) {
