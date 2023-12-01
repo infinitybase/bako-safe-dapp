@@ -13,7 +13,7 @@
   "dependencies": {
     "@fuel-wallet/react": "0.14.0-preview-a651bbe",
     "axios": "^1.6.1",
-    "bsafe": "../../bsafe",
+    "bsafe": "0.0.18",
     "events": "^3.3.0",
     "fuels": "^0.67.0",
     "react": "^18.2.0",
