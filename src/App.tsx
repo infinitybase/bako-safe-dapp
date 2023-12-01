@@ -98,7 +98,7 @@ function App() {
     <>
       <button
         onClick={async () => {
-          connect(),
+          connect()
         }}
       >
         CONNECT
@@ -131,5 +131,8 @@ function App() {
     </>
   );
 }
+
+
+
 
 export default App;
