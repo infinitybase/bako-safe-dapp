@@ -11,10 +11,15 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@chakra-ui/icons": "^2.1.1",
+    "@chakra-ui/react": "^2.8.2",
+    "@emotion/react": "^11.11.1",
+    "@emotion/styled": "^11.11.0",
     "@fuel-wallet/react": "0.14.0-preview-a651bbe",
     "axios": "^1.6.1",
-    "bsafe": "0.0.19",
+    "bsafe": "../bsafe/",
     "events": "^3.3.0",
+    "framer-motion": "^10.16.12",
     "fuels": "^0.67.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
