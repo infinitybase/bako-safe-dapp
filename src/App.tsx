@@ -3,14 +3,11 @@ import { bn, Address, BaseAssetId } from 'fuels';
 import { defaultConfigurable } from 'bsafe';
 import { MyContractAbi__factory } from './contracts/contracts/factories/MyContractAbi__factory';
 import contractIds from './contracts/contract-ids.json';
-import logo from './assets/logo-bsafe.svg';
-import link from './assets/icons/link.svg';
 import add from './assets/icons/add.svg';
 
 /* eslint-disable no-console */
 import {
   useDisconnect,
-  useConnectUI,
   useIsConnected,
   useFuel,
   useAccount,
@@ -36,28 +33,56 @@ import {
 } from '@chakra-ui/react';
 import { AddressCopy } from './components/addressCopy';
 import { AddressUtils } from './utils/address';
-//import { useEffect } from 'react';
-
-interface IHandleTransfer {
-  assetId?: string;
-  amount?: string;
-}
+import { useNotification } from './hooks/useNotification';
+import { Toast } from './components/toast';
+import { ConnectionScreen } from './pages/connection';
 
 function App() {
-  const { connect } = useConnectUI();
-  const { fuel } = useFuel();
+  const { isOpen, onOpen, onClose } = useDisclosure();
   const { disconnect } = useDisconnect();
+  const { fuel } = useFuel();
   const { isConnected } = useIsConnected();
   const { account } = useAccount();
+  const toast = useNotification();
+
   const [balance, setBalance] = useState('');
-  const { isOpen, onOpen, onClose } = useDisclosure();
   //  const { network } = useNetwork();
 
+  const [addressInput, setAddressInput] = useState('');
+  const [amountInput, setAmountInput] = useState('');
+  const [addressError, setAddressError] = useState(false);
+  const [amountError, setAmountError] = useState(false);
+
   const faucetUrl = 'https://faucet-beta-4.fuel.network/?address=';
+  const blockExplorerUrl =
+    'https://fuellabs.github.io/block-explorer-v2/beta-4/#/transaction';
+
+  const disableSubmit =
+    amountError ||
+    addressError ||
+    !amountInput ||
+    !addressInput ||
+    !Number(amountInput);
 
   // useEffect(() => {
   //   console.log('[network]: ', network);
   // }, [isConnected]);
+
+  async function handleGetBalance() {
+    if (!account) return;
+
+    const provider = await FuelWalletProvider.create(
+      defaultConfigurable['provider']
+    );
+    const wallet = await fuel.getWallet(account, provider);
+    const balance = await wallet.getBalance();
+
+    setBalance(
+      bn(bn.parseUnits(balance.format() ?? '0.000')).format({
+        precision: 4,
+      })
+    );
+  }
 
   async function handleContractCall() {
     if (!account) return;
@@ -78,18 +103,37 @@ function App() {
         gasLimit: bn(1_000_000),
       })
       .call();
-    // TODO: Dispatch success or error toasts (use then + catch)
     // transactionId vai ser o txID do banco de dados
+
+    handleGetBalance();
+
+    toast({
+      isClosable: true,
+      render: () => (
+        <Box cursor="pointer" onClick={() => toast.closeAll()}>
+          <Toast
+            title="Transaction completed"
+            description="One transaction has been completed. "
+            action={() =>
+              window.open(`${blockExplorerUrl}/${transactionId}`, '_blank')
+            }
+            actionTitle="Block explorer"
+          />
+        </Box>
+      ),
+    });
+
     console.log(value);
     console.log(transactionId);
     //console.log('[PAGE]: sendTransaction');
   }
 
-  async function handleTransfer(params?: IHandleTransfer) {
+  async function handleTransfer() {
     // --> BSafeProvider -> extends FuelWalletProvider -> getTransactionResponse -> TransactionReponse -> waitForApproval.
-    const { amount } = params ?? {};
     //console.log(account, defaultConfigurable['provider']);
     if (!account) return;
+    const amount = bn.parseUnits(amountInput) ?? bn(1_000);
+
     const provider = await FuelWalletProvider.create(
       defaultConfigurable['provider']
     );
@@ -97,58 +141,90 @@ function App() {
     const wallet = await fuel.getWallet(account, provider);
     // await wallet.getBalance(); -> recive balance of predicate
 
+    onClose();
+    setAddressInput('');
+    setAmountInput('');
+    setAddressError(false);
+    setAmountError(false);
+
     const result = await wallet.transfer(
-      Address.fromString(
-        'fuel1rjlvmq9q25l4388940wpepyceksex5la0wd7093vgwmar0tqn0yscnd0u2'
-      ), // todo: move to dynamic this address, this static address is from 'STORE' in mock API
-      bn(amount ?? 1_000),
+      Address.fromString(addressInput),
+      amount,
       BaseAssetId,
       {
-        // In case of error, use the provider
+        // !! In case of error, use the provider
         gasPrice: defaultConfigurable['gasPrice'],
         gasLimit: defaultConfigurable['gasLimit'],
         // gasPrice: bn(1),
         // gasLimit: bn(1_000_000),
       }
     );
-    //console.log('result: ', result);
+
+    setTimeout(() => {
+      toast({
+        isClosable: true,
+        render: () => (
+          <Box cursor="pointer" onClick={() => toast.closeAll()}>
+            <Toast
+              title="Transaction created"
+              description="You've created a transaction. Review your vault and approve this
+              transfer for sending."
+              action={() => window.open(`http://localhost:5173/home`, '_blank')}
+              actionTitle="Access transaction"
+            />
+          </Box>
+        ),
+      });
+    }, 3000);
+
     try {
       const { id, status } = await result.waitForResult();
-      console.log('result: ', {
-        id,
-        status,
+      console.log('result: ', { id, status });
+
+      handleGetBalance();
+
+      toast({
+        isClosable: true,
+        render: () => (
+          <Box cursor="pointer" onClick={() => toast.closeAll()}>
+            <Toast
+              title="Transaction completed"
+              description="One transaction has been completed. "
+              action={() => window.open(`${blockExplorerUrl}/${id}`, '_blank')}
+              actionTitle="Block explorer"
+            />
+          </Box>
+        ),
       });
-      //todo: dispatch toast with transaction status and redirect to block explorer
     } catch (e) {
       console.log('error: ', e);
-      //todo: 'dispatch toast with error message';
+      // TODO: 'dispatch toast with error message';
     }
-  }
-
-  async function handleGetBalance() {
-    if (!account) return;
-
-    const provider = await FuelWalletProvider.create(
-      defaultConfigurable['provider']
-    );
-    const wallet = await fuel.getWallet(account, provider);
-    const balance = await wallet.getBalance();
-
-    setBalance(
-      bn(bn.parseUnits(balance.format() ?? '0.000')).format({
-        precision: 4,
-      })
-    );
   }
 
   useEffect(() => {
     handleGetBalance();
   }, [account]);
 
+  // Validate inputs
+  useEffect(() => {
+    if (addressInput && !AddressUtils.isValid(addressInput!))
+      setAddressError(true);
+    if (Number(amountInput) > Number(balance)) setAmountError(true);
+  }, [addressInput, amountInput, balance]);
+
   return (
     <Center bg="#0F0F0F" h="100vh">
-      <Modal isOpen={isOpen} onClose={onClose}>
-        {/* <ModalOverlay /> */}
+      {!isConnected && <ConnectionScreen />}
+
+      <Modal
+        isOpen={isOpen}
+        onClose={() => {
+          setAmountError(false);
+          setAddressError(false);
+          onClose();
+        }}
+      >
         <ModalContent alignSelf="center">
           <ModalBody w="full" h="full" bg="#0F0F0F" color="white">
             <VStack alignItems="flex-start">
@@ -169,20 +245,47 @@ function App() {
                 Set the recipient for this transfer.
               </Text>
 
+              {/* FORM */}
               <Box w="full">
-                <FormControl isInvalid={false}>
+                <FormControl isInvalid={addressError} isRequired={true}>
                   <Input
                     // value={field.value}
-                    // onChange={field.onChange}
+                    onChange={(e) => {
+                      setAddressError(false);
+                      setAddressInput(e.target.value);
+                    }}
                     placeholder=" "
                   />
-                  <FormLabel>Vault name</FormLabel>
-                  <FormHelperText color="error.500">
-                    Error message
-                  </FormHelperText>
+                  <FormLabel>Address</FormLabel>
+                  {addressError && (
+                    <FormHelperText color="error.600">
+                      Invalid address
+                    </FormHelperText>
+                  )}
                 </FormControl>
               </Box>
 
+              <Box w="full" mt={4}>
+                <FormControl isInvalid={amountError} isRequired={true}>
+                  <Input
+                    // value={field.value}
+                    type="number"
+                    onChange={(e) => {
+                      setAmountError(false);
+                      setAmountInput(e.target.value);
+                    }}
+                    placeholder=" "
+                  />
+                  <FormLabel>Amount</FormLabel>
+                  {amountError && (
+                    <FormHelperText color="error.600">
+                      You don't have enough funds
+                    </FormHelperText>
+                  )}
+                </FormControl>
+              </Box>
+
+              {/* ACTIONS */}
               <HStack
                 w="full"
                 justifyContent="center"
@@ -211,7 +314,9 @@ function App() {
                   fontWeight="bold"
                   borderRadius={10}
                   onClick={() => handleTransfer()}
+                  isDisabled={disableSubmit}
                   color="#121212"
+                  _hover={{ backgroundColor: 'brand.600' }}
                 >
                   <Box fontSize={12}>
                     <img src={add} />
@@ -224,12 +329,13 @@ function App() {
         </ModalContent>
       </Modal>
 
+      {/* Logged screen */}
       {isConnected && (
         <VStack spacing={0}>
-          <HStack spacing={6}>
+          <HStack w="full" spacing={6} justifyContent={'flex-start'}>
             <AddressCopy
-              w={52}
-              address={AddressUtils.format(account!)!}
+              w={44}
+              address={account ?? ''}
               bg="#2C2C2C"
               color="#696B65"
             />
@@ -258,6 +364,7 @@ function App() {
                 fontWeight="bold"
                 borderRadius={10}
                 onClick={() => window.open(`${faucetUrl}${account}`, '_blank')}
+                _hover={{ backgroundColor: 'brand.600' }}
               >
                 Faucet
               </Button>
@@ -275,8 +382,8 @@ function App() {
                 fontSize="sm"
                 fontWeight="bold"
                 borderRadius={10}
-                // onClick={() => handleTransfer()}
                 onClick={onOpen}
+                _hover={{ backgroundColor: 'brand.600' }}
               >
                 Send
               </Button>
@@ -290,14 +397,15 @@ function App() {
             <VStack alignItems="flex-start">
               <Button
                 w={130}
-                bg="#2C2C2C"
-                color="#C0C0C0"
+                bg="grey.300"
+                color="grey.200"
                 px={4}
                 py={1}
                 fontSize="sm"
                 fontWeight="bold"
                 borderRadius={10}
                 onClick={() => disconnect()}
+                _hover={{ backgroundColor: 'grey.900' }}
               >
                 Disconnect
               </Button>
@@ -316,6 +424,7 @@ function App() {
                 fontWeight="bold"
                 borderRadius={10}
                 onClick={() => handleContractCall()}
+                _hover={{ backgroundColor: 'brand.600' }}
               >
                 Call Contract
               </Button>
@@ -324,30 +433,6 @@ function App() {
               </Text>
             </VStack>
           </HStack>
-        </VStack>
-      )}
-
-      {!isConnected && (
-        <VStack spacing={16}>
-          <Box w={230}>
-            <img src={logo} />
-          </Box>
-          <Button
-            bg="#49F8AE"
-            px={4}
-            py={3}
-            gap={2}
-            fontWeight="bold"
-            borderRadius={10}
-            onClick={async () => {
-              connect();
-            }}
-          >
-            <Box>
-              <img src={link} />
-            </Box>
-            Connect wallet
-          </Button>
         </VStack>
       )}
     </Center>

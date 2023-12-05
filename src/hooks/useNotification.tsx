@@ -1,5 +1,4 @@
 import { useToast, UseToastOptions } from '@chakra-ui/react';
-import { Notification } from '../components/notification';
 
 const useNotification = (options?: UseToastOptions) => {
   return useToast({
@@ -9,8 +8,8 @@ const useNotification = (options?: UseToastOptions) => {
       flexDirection: 'column',
       minW: 'min-content',
     },
+    duration: 20000,
     position: 'top-right',
-    render: (props) => <Notification {...props} />,
     ...options,
   });
 };

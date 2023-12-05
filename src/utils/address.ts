@@ -10,7 +10,7 @@ class AddressUtils {
   }
 
   static format(address: string) {
-    if (!address) return;
+    if (!address) return '';
     return `${address.slice(0, 10)}...${address.slice(-5)}`;
   }
 }
