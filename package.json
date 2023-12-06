@@ -16,7 +16,7 @@
     "@emotion/react": "^11.11.1",
     "@emotion/styled": "^11.11.0",
     "@fuel-wallet/react": "0.14.0-preview-a651bbe",
-    "bsafe": "0.0.23",
+    "bsafe": "0.0.26",
     "framer-motion": "^10.16.12",
     "fuels": "^0.67.0",
     "react": "^18.2.0",
