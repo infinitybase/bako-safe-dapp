@@ -102,7 +102,7 @@ function App() {
               description="You've created a transaction. Review your vault and approve this
               transfer for sending."
               action={() =>
-                window.open(import.meta.env.VITE_BSAFE_APP, '_blank')
+                window.open(`${import.meta.env.VITE_BSAFE_APP}/home`, '_blank')
               }
               actionTitle="Access transaction"
             />
@@ -189,7 +189,7 @@ function App() {
               description="You've created a transaction. Review your vault and approve this
               transfer for sending."
               action={() =>
-                window.open(import.meta.env.VITE_BSAFE_APP, '_blank')
+                window.open(`${import.meta.env.VITE_BSAFE_APP}/home`, '_blank')
               }
               actionTitle="Access transaction"
             />
