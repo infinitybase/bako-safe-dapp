@@ -8,8 +8,8 @@ export const ConnectionScreen = () => {
   const { connect } = useConnectUI();
 
   return (
-    <VStack spacing={16}>
-      <Box w={230}>
+    <VStack spacing={20}>
+      <Box w={230} position={'absolute'} top={200}>
         <img src={logo} />
       </Box>
       <Button
@@ -21,6 +21,7 @@ export const ConnectionScreen = () => {
         borderRadius={10}
         onClick={async () => connect()}
         _hover={{ backgroundColor: 'brand.600' }}
+        position={'absolute'}
       >
         <Box>
           <img src={link} />

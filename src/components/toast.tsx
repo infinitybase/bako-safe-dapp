@@ -40,6 +40,7 @@ const Toast = ({ description, title, actionTitle, action }: ToastProps) => {
               w={'100%'}
               bg="brand.500"
               borderRadius={10}
+              _hover={{ backgroundColor: 'brand.600' }}
             >
               {actionTitle}
             </Button>

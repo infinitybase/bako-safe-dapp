@@ -44,18 +44,13 @@ function App() {
   const { isConnected } = useIsConnected();
   const { account } = useAccount();
   const toast = useNotification();
-
-  const [balance, setBalance] = useState('');
   //  const { network } = useNetwork();
 
+  const [balance, setBalance] = useState('');
   const [addressInput, setAddressInput] = useState('');
   const [amountInput, setAmountInput] = useState('');
   const [addressError, setAddressError] = useState(false);
   const [amountError, setAmountError] = useState(false);
-
-  const faucetUrl = 'https://faucet-beta-4.fuel.network/?address=';
-  const blockExplorerUrl =
-    'https://fuellabs.github.io/block-explorer-v2/beta-4/#/transaction';
 
   const disableSubmit =
     amountError ||
@@ -95,6 +90,27 @@ function App() {
       contractIds.myContract,
       wallet
     );
+
+    setTimeout(() => {
+      toast({
+        isClosable: true,
+        duration: 60000,
+        render: () => (
+          <Box cursor="pointer" onClick={() => toast.closeAll()}>
+            <Toast
+              title="Transaction created"
+              description="You've created a transaction. Review your vault and approve this
+              transfer for sending."
+              action={() =>
+                window.open(import.meta.env.VITE_BSAFE_APP, '_blank')
+              }
+              actionTitle="Access transaction"
+            />
+          </Box>
+        ),
+      });
+    }, 10000);
+
     // await wallet.getBalance(); -> recive balance of predicate
     const { value, transactionId } = await contract.functions
       .return_true(10)
@@ -115,7 +131,10 @@ function App() {
             title="Transaction completed"
             description="One transaction has been completed. "
             action={() =>
-              window.open(`${blockExplorerUrl}/${transactionId}`, '_blank')
+              window.open(
+                `${import.meta.env.VITE_BLOCK_EXPLORER}/${transactionId}`,
+                '_blank'
+              )
             }
             actionTitle="Block explorer"
           />
@@ -169,7 +188,9 @@ function App() {
               title="Transaction created"
               description="You've created a transaction. Review your vault and approve this
               transfer for sending."
-              action={() => window.open(`http://localhost:5173/home`, '_blank')}
+              action={() =>
+                window.open(import.meta.env.VITE_BSAFE_APP, '_blank')
+              }
               actionTitle="Access transaction"
             />
           </Box>
@@ -190,7 +211,12 @@ function App() {
             <Toast
               title="Transaction completed"
               description="One transaction has been completed. "
-              action={() => window.open(`${blockExplorerUrl}/${id}`, '_blank')}
+              action={() =>
+                window.open(
+                  `${import.meta.env.VITE_BLOCK_EXPLORER}/${id}`,
+                  '_blank'
+                )
+              }
               actionTitle="Block explorer"
             />
           </Box>
@@ -205,8 +231,7 @@ function App() {
   useEffect(() => {
     handleGetBalance();
   }, [account]);
-
-  // Validate inputs
+  // Inputs validations
   useEffect(() => {
     if (addressInput && !AddressUtils.isValid(addressInput!))
       setAddressError(true);
@@ -249,7 +274,6 @@ function App() {
               <Box w="full">
                 <FormControl isInvalid={addressError} isRequired={true}>
                   <Input
-                    // value={field.value}
                     onChange={(e) => {
                       setAddressError(false);
                       setAddressInput(e.target.value);
@@ -363,8 +387,13 @@ function App() {
                 fontSize="sm"
                 fontWeight="bold"
                 borderRadius={10}
-                onClick={() => window.open(`${faucetUrl}${account}`, '_blank')}
                 _hover={{ backgroundColor: 'brand.600' }}
+                onClick={() =>
+                  window.open(
+                    `${import.meta.env.VITE_FAUCET}?address=${account}`,
+                    '_blank'
+                  )
+                }
               >
                 Faucet
               </Button>
