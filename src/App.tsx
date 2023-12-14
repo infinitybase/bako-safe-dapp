@@ -2,7 +2,7 @@
 import { bn, Address, BaseAssetId } from 'fuels';
 import { defaultConfigurable } from 'bsafe';
 import { MyContractAbi__factory } from './contracts/contracts/factories/MyContractAbi__factory';
-import contractIds from './contracts/contract-ids.json';
+import { myContract } from './contracts/contract-ids.json';
 import add from './assets/icons/add.svg';
 
 /* eslint-disable no-console */
@@ -11,7 +11,6 @@ import {
   useIsConnected,
   useFuel,
   useAccount,
-  //useNetwork,
 } from '@fuel-wallet/react';
 import { FuelWalletProvider } from '@fuel-wallet/sdk';
 import { useEffect, useState } from 'react';
@@ -38,13 +37,13 @@ import { Toast } from './components/toast';
 import { ConnectionScreen } from './pages/connection';
 
 function App() {
-  const { isOpen, onOpen, onClose } = useDisclosure();
-  const { disconnect } = useDisconnect();
   const { fuel } = useFuel();
-  const { isConnected } = useIsConnected();
   const { account } = useAccount();
+  const { disconnect } = useDisconnect();
+  const { isConnected } = useIsConnected();
+  const { isOpen, onOpen, onClose } = useDisclosure();
+
   const toast = useNotification();
-  //  const { network } = useNetwork();
 
   const [balance, setBalance] = useState('');
   const [addressInput, setAddressInput] = useState('');
@@ -58,10 +57,6 @@ function App() {
     !amountInput ||
     !addressInput ||
     !Number(amountInput);
-
-  // useEffect(() => {
-  //   console.log('[network]: ', network);
-  // }, [isConnected]);
 
   async function handleGetBalance() {
     if (!account) return;
@@ -86,10 +81,7 @@ function App() {
     );
     //console.log(provider);
     const wallet = await fuel.getWallet(account, provider);
-    const contract = MyContractAbi__factory.connect(
-      contractIds.myContract,
-      wallet
-    );
+    const contract = MyContractAbi__factory.connect(myContract, wallet);
 
     setTimeout(() => {
       toast({
@@ -292,11 +284,13 @@ function App() {
               <Box w="full" mt={4}>
                 <FormControl isInvalid={amountError} isRequired={true}>
                   <Input
-                    // value={field.value}
+                    step={0.000000001}
                     type="number"
                     onChange={(e) => {
                       setAmountError(false);
-                      setAmountInput(e.target.value);
+                      const [a, b] = e.target.value.split('.');
+
+                      setAmountInput(`${a}.${b.slice(0, 9) ?? '000000000'}`);
                     }}
                     placeholder=" "
                   />

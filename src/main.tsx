@@ -1,7 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App.tsx';
-// import './index.css';
 import { FuelProvider } from '@fuel-wallet/react';
 import { BSafeConnector } from 'bsafe';
 import { ChakraProvider } from '@chakra-ui/react';
