@@ -221,7 +221,15 @@ function App() {
   }
 
   useEffect(() => {
+    const balanceInterval = setInterval(() => {
+      handleGetBalance();
+    }, 5000);
+
     handleGetBalance();
+
+    return () => {
+      clearInterval(balanceInterval);
+    }
   }, [account]);
   // Inputs validations
   useEffect(() => {
