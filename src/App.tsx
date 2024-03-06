@@ -320,8 +320,6 @@ function App() {
                 mt={8}
               >
                 <Button
-                  bg="brand.500"
-                  color="#C0C0C0"
                   px={4}
                   py={2}
                   fontSize="sm"
@@ -332,7 +330,7 @@ function App() {
                   Cancel
                 </Button>
                 <Button
-                  bg="#49F8AE"
+                  bg="brand.500"
                   px={6}
                   py={2}
                   gap={2}
