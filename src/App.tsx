@@ -1,6 +1,6 @@
 // import './App.css';
 import { bn, Address, BaseAssetId } from 'fuels';
-import { defaultConfigurable } from 'bsafe';
+import { defaultConfig as defaultConfigurable } from 'bsafe';
 import { MyContractAbi__factory } from './contracts/contracts/factories/MyContractAbi__factory';
 import { myContract } from './contracts/contract-ids.json';
 import add from './assets/icons/add.svg';
@@ -11,7 +11,7 @@ import {
   useIsConnected,
   useFuel,
   useAccount,
-} from '@fuel-wallet/react';
+} from '@fuels/react';
 import { FuelWalletProvider } from '@fuel-wallet/sdk';
 import { useEffect, useState } from 'react';
 import {
@@ -62,7 +62,7 @@ function App() {
     if (!account) return;
 
     const provider = await FuelWalletProvider.create(
-      defaultConfigurable['provider']
+      defaultConfigurable['PROVIDER']!
     );
     const wallet = await fuel.getWallet(account, provider);
     const balance = await wallet.getBalance();
@@ -77,7 +77,7 @@ function App() {
   async function handleContractCall() {
     if (!account) return;
     const provider = await FuelWalletProvider.create(
-      defaultConfigurable['provider']
+      defaultConfigurable['PROVIDER']!
     );
     //console.log(provider);
     const wallet = await fuel.getWallet(account, provider);
@@ -146,7 +146,7 @@ function App() {
     const amount = bn.parseUnits(amountInput) ?? bn(1_000);
 
     const provider = await FuelWalletProvider.create(
-      defaultConfigurable['provider']
+      defaultConfigurable['PROVIDER']!
     );
     //console.log(provider);
     const wallet = await fuel.getWallet(account, provider);
@@ -164,8 +164,8 @@ function App() {
       BaseAssetId,
       {
         // !! In case of error, use the provider
-        gasPrice: defaultConfigurable['gasPrice'],
-        gasLimit: defaultConfigurable['gasLimit'],
+        gasPrice: defaultConfigurable['GAS_PRICE'],
+        gasLimit: defaultConfigurable['GAS_LIMIT'],
         // gasPrice: bn(1),
         // gasLimit: bn(1_000_000),
       }
