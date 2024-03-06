@@ -320,7 +320,7 @@ function App() {
                 mt={8}
               >
                 <Button
-                  bg="#2C2C2C"
+                  bg="brand.500"
                   color="#C0C0C0"
                   px={4}
                   py={2}
@@ -383,7 +383,7 @@ function App() {
             <VStack alignItems="flex-start">
               <Button
                 w={130}
-                bg="#49F8AE"
+                bg="brand.500"
                 px={4}
                 py={1}
                 fontSize="sm"
@@ -407,7 +407,7 @@ function App() {
             <VStack alignItems="flex-start">
               <Button
                 w={130}
-                bg="#49F8AE"
+                bg="brand.500"
                 px={4}
                 py={1}
                 fontSize="sm"
@@ -448,7 +448,7 @@ function App() {
             <VStack alignItems="flex-start">
               <Button
                 w={130}
-                bg="#49F8AE"
+                bg="brand.500"
                 px={4}
                 py={1}
                 fontSize="sm"
@@ -460,7 +460,7 @@ function App() {
                 Call Contract
               </Button>
               <Text color="#696B65" fontSize="xs" maxW={44}>
-                Call an example contract to use this on Bsafe
+                Call an example contract to use this on Bako Safe
               </Text>
             </VStack>
           </HStack>
