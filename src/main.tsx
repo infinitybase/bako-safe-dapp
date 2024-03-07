@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App.tsx';
-import { FuelProvider } from '@fuel-wallet/react';
+import { FuelProvider } from '@fuels/react';
 import { BSafeConnector } from 'bsafe';
 import { ChakraProvider } from '@chakra-ui/react';
 import { defaultTheme } from './themes/default.ts';
@@ -13,9 +13,8 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
     <FuelProvider
       theme={'dark'}
       fuelConfig={{
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        connectors: [bsafe as any], // todo: remove this with update on version @fuel-wallet/react
-        storage: null,
+        connectors: [bsafe],
+        storage: null
       }}
     >
       <ChakraProvider theme={defaultTheme}>
