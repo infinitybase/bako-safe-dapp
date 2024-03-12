@@ -1,10 +1,10 @@
 import { createConfig } from 'fuels';
 
 export default createConfig({
-  providerUrl: 'https://beta-4.fuel.network/graphql',
-  //useBuiltinFuelCore: false,
+  providerUrl: 'https://beta-5.fuel.network/graphql',
+  useBuiltinFuelCore: false,
   output: './src/contracts/',
   contracts: ['./sway'],
   privateKey:
-    '0xb52a8d9eaa90e36baf43404d488e7c45cb612b9a035af8761d02b39fd630b0c3',
+    '0x2676bd551fdfe92b496d6c3af652c52b1d06f2f1990a4422bd542831262ad526',
 });
