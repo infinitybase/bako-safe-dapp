@@ -1,11 +1,19 @@
 // import './App.css';
+import { bn, Address, BaseAssetId } from 'fuels';
 import { defaultConfig as defaultConfigurable } from 'bsafe';
-import { Address, BaseAssetId, bn } from 'fuels';
-import add from './assets/icons/add.svg';
-import { myContract } from './contracts/contract-ids.json';
 import { MyContractAbi__factory } from './contracts/contracts/factories/MyContractAbi__factory';
+import { myContract } from './contracts/contract-ids.json';
+import add from './assets/icons/add.svg';
 
 /* eslint-disable no-console */
+import {
+  useDisconnect,
+  useIsConnected,
+  useFuel,
+  useAccount,
+} from '@fuels/react';
+import { FuelWalletProvider } from '@fuel-wallet/sdk';
+import { useEffect, useState } from 'react';
 import {
   Box,
   Button,
@@ -22,19 +30,11 @@ import {
   VStack,
   useDisclosure,
 } from '@chakra-ui/react';
-import { FuelWalletProvider } from '@fuel-wallet/sdk';
-import {
-  useAccount,
-  useDisconnect,
-  useFuel,
-  useIsConnected,
-} from '@fuels/react';
-import { useEffect, useState } from 'react';
 import { AddressCopy } from './components/addressCopy';
-import { Toast } from './components/toast';
-import { useNotification } from './hooks/useNotification';
-import { ConnectionScreen } from './pages/connection';
 import { AddressUtils } from './utils/address';
+import { useNotification } from './hooks/useNotification';
+import { Toast } from './components/toast';
+import { ConnectionScreen } from './pages/connection';
 
 function App() {
   const { fuel } = useFuel();
@@ -104,7 +104,7 @@ function App() {
     }, 10000);
 
     // await wallet.getBalance(); -> recive balance of predicate
-    const { transactionId } = await contract.functions
+    const { value, transactionId } = await contract.functions
       .return_true(10)
       .txParams({
         gasPrice: bn(1),
@@ -134,6 +134,8 @@ function App() {
       ),
     });
 
+    console.log(value);
+    console.log(transactionId);
     //console.log('[PAGE]: sendTransaction');
   }
 
@@ -227,7 +229,7 @@ function App() {
 
     return () => {
       clearInterval(balanceInterval);
-    };
+    }
   }, [account]);
   // Inputs validations
   useEffect(() => {
@@ -301,11 +303,6 @@ function App() {
                     placeholder=" "
                   />
                   <FormLabel>Amount</FormLabel>
-                  {!amountError && (
-                    <FormHelperText color="#696B65">
-                      {balance} ETH available
-                    </FormHelperText>
-                  )}
                   {amountError && (
                     <FormHelperText color="error.600">
                       You don't have enough funds
