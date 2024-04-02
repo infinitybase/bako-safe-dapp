@@ -16,7 +16,7 @@
     "@emotion/react": "^11.11.4",
     "@emotion/styled": "^11.11.0",
     "@fuel-wallet/react": "^0.15.2",
-    "bako-safe":"/Users/guimroque/Infinity/bsafe/bsafe/packages/sdk/bsafe-0.0.50.12897.tgz",
+    "bakosafe":"0.0.50",
     "framer-motion": "^10.18.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
