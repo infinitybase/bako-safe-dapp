@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App.tsx';
 import { FuelProvider } from '@fuels/react';
-import { BakoSafeConnector } from 'bako-safe';
+import { BakoSafeConnector } from 'bakosafe';
 import { ChakraProvider } from '@chakra-ui/react';
 import { defaultTheme } from './themes/default.ts';
 

@@ -3,7 +3,7 @@ import { Address, BaseAssetId, bn } from 'fuels';
 import add from './assets/icons/add.svg';
 import { myContract } from './contracts/contract-ids.json';
 import { MyContractAbi__factory } from './contracts/contracts/factories/MyContractAbi__factory';
-import { BSafe } from 'bako-safe';
+import { BakoSafe } from 'bakosafe';
 /* eslint-disable no-console */
 import {
   Box,
@@ -42,10 +42,10 @@ function App() {
   const { isConnected } = useIsConnected();
   const { isOpen, onOpen, onClose } = useDisclosure();
 
-  BSafe.setup({
+  BakoSafe.setup({
     PROVIDER: import.meta.env.VITE_PROVIDER,
-    API_URL: import.meta.env.VITE_BSAFE_API,
-    BSAFE_URL: import.meta.env.VITE_BSAFE_APP,
+    SERVER_URL: import.meta.env.VITE_BSAFE_API,
+    CLIENT_URL: import.meta.env.VITE_BSAFE_APP,
   })
 
 
@@ -68,7 +68,7 @@ function App() {
     if (!account) return;
 
     const provider = await FuelWalletProvider.create(
-      BSafe.get('PROVIDER')
+      BakoSafe.get('PROVIDER')
     );
     const wallet = await fuel.getWallet(account, provider);
     const balance = await wallet.getBalance();
@@ -83,7 +83,7 @@ function App() {
   async function handleContractCall() {
     if (!account) return;
     const provider = await FuelWalletProvider.create(
-      BSafe.get('PROVIDER')
+      BakoSafe.get('PROVIDER')
     );
     //console.log(provider);
     const wallet = await fuel.getWallet(account, provider);
@@ -150,7 +150,7 @@ function App() {
     const amount = bn.parseUnits(amountInput) ?? bn(1_000);
 
     const provider = await FuelWalletProvider.create(
-      BSafe.get('PROVIDER')
+      BakoSafe.get('PROVIDER')
     );
     //console.log(provider);
     const wallet = await fuel.getWallet(account, provider);
