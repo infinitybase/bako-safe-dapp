@@ -1,10 +1,9 @@
 // import './App.css';
-import { defaultConfig as defaultConfigurable } from 'bsafe';
 import { Address, BaseAssetId, bn } from 'fuels';
 import add from './assets/icons/add.svg';
 import { myContract } from './contracts/contract-ids.json';
 import { MyContractAbi__factory } from './contracts/contracts/factories/MyContractAbi__factory';
-
+import { BakoSafe } from 'bakosafe';
 /* eslint-disable no-console */
 import {
   Box,
@@ -43,6 +42,13 @@ function App() {
   const { isConnected } = useIsConnected();
   const { isOpen, onOpen, onClose } = useDisclosure();
 
+  BakoSafe.setup({
+    PROVIDER: import.meta.env.VITE_PROVIDER,
+    SERVER_URL: import.meta.env.VITE_BSAFE_API,
+    CLIENT_URL: import.meta.env.VITE_BSAFE_APP,
+  })
+
+
   const toast = useNotification();
 
   const [balance, setBalance] = useState('');
@@ -62,7 +68,7 @@ function App() {
     if (!account) return;
 
     const provider = await FuelWalletProvider.create(
-      defaultConfigurable['PROVIDER']!
+      BakoSafe.get('PROVIDER')
     );
     const wallet = await fuel.getWallet(account, provider);
     const balance = await wallet.getBalance();
@@ -77,7 +83,7 @@ function App() {
   async function handleContractCall() {
     if (!account) return;
     const provider = await FuelWalletProvider.create(
-      defaultConfigurable['PROVIDER']!
+      BakoSafe.get('PROVIDER')
     );
     //console.log(provider);
     const wallet = await fuel.getWallet(account, provider);
@@ -144,7 +150,7 @@ function App() {
     const amount = bn.parseUnits(amountInput) ?? bn(1_000);
 
     const provider = await FuelWalletProvider.create(
-      defaultConfigurable['PROVIDER']!
+      BakoSafe.get('PROVIDER')
     );
     //console.log(provider);
     const wallet = await fuel.getWallet(account, provider);
@@ -162,8 +168,7 @@ function App() {
       BaseAssetId,
       {
         // !! In case of error, use the provider
-        gasPrice: defaultConfigurable['GAS_PRICE'],
-        gasLimit: defaultConfigurable['GAS_LIMIT'],
+        
         // gasPrice: bn(1),
         // gasLimit: bn(1_000_000),
       }
