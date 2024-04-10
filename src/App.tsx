@@ -42,8 +42,8 @@ function App() {
   const { isConnected } = useIsConnected();
   const { isOpen, onOpen, onClose } = useDisclosure();
 
-  BakoSafe.setup({
-    PROVIDER: import.meta.env.VITE_PROVIDER,
+  BakoSafe.setProviders({
+    CHAIN_URL: import.meta.env.VITE_PROVIDER,
     SERVER_URL: import.meta.env.VITE_BSAFE_API,
     CLIENT_URL: import.meta.env.VITE_BSAFE_APP,
   })
@@ -68,7 +68,7 @@ function App() {
     if (!account) return;
 
     const provider = await FuelWalletProvider.create(
-      BakoSafe.get('PROVIDER')
+      BakoSafe.getProviders('CHAIN_URL')
     );
     const wallet = await fuel.getWallet(account, provider);
     const balance = await wallet.getBalance();
@@ -83,7 +83,7 @@ function App() {
   async function handleContractCall() {
     if (!account) return;
     const provider = await FuelWalletProvider.create(
-      BakoSafe.get('PROVIDER')
+      BakoSafe.getProviders('CHAIN_URL')
     );
     //console.log(provider);
     const wallet = await fuel.getWallet(account, provider);
@@ -130,7 +130,7 @@ function App() {
             description="One transaction has been completed. "
             action={() =>
               window.open(
-                `${import.meta.env.VITE_BLOCK_EXPLORER}/${transactionId}`,
+                `${import.meta.env.VITE_BLOCK_EXPLORER}/tx/${transactionId}`,
                 '_blank'
               )
             }
@@ -150,7 +150,7 @@ function App() {
     const amount = bn.parseUnits(amountInput) ?? bn(1_000);
 
     const provider = await FuelWalletProvider.create(
-      BakoSafe.get('PROVIDER')
+      BakoSafe.getProviders('CHAIN_URL')
     );
     //console.log(provider);
     const wallet = await fuel.getWallet(account, provider);
@@ -208,7 +208,7 @@ function App() {
               description="One transaction has been completed. "
               action={() =>
                 window.open(
-                  `${import.meta.env.VITE_BLOCK_EXPLORER}/${id}`,
+                  `${import.meta.env.VITE_BLOCK_EXPLORER}/tx/${id}`,
                   '_blank'
                 )
               }
