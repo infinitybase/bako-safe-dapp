@@ -18,7 +18,7 @@ dependencies:
     specifier: ^11.11.0
     version: 11.11.5(@emotion/react@11.11.4)(@types/react@18.2.73)(react@18.2.0)
   '@fuel-wallet/react':
-    specifier: ^0.15.2
+    specifier: 0.15.2
     version: 0.15.2(@types/react-dom@18.2.23)(@types/react@18.2.73)(fuels@0.76.12)(react-dom@18.2.0)(react@18.2.0)
   '@fuel-wallet/sdk':
     specifier: 0.15.2

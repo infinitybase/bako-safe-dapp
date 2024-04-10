@@ -6,7 +6,7 @@ import { BakoSafeConnector } from 'bakosafe';
 import { ChakraProvider } from '@chakra-ui/react';
 import { defaultTheme } from './themes/default.ts';
 
-const bsafe = new BakoSafeConnector();
+const bakosafe = new BakoSafeConnector();
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
@@ -14,7 +14,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
       theme={'dark'}
       fuelConfig={{
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        connectors: [bsafe as any],
+        connectors: [bakosafe as any],
         storage: null
       }}
     >

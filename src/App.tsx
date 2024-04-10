@@ -113,8 +113,8 @@ function App() {
     const { transactionId } = await contract.functions
       .return_true(10)
       .txParams({
-        gasPrice: bn(1),
-        gasLimit: bn(1_000_000),
+        gasPrice: bn(BakoSafe.getGasConfig('GAS_PRICE')),
+        gasLimit: bn(BakoSafe.getGasConfig('GAS_PRICE')),
       })
       .call();
     // transactionId vai ser o txID do banco de dados
